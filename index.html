@@ -2577,7 +2577,7 @@ function computeStats() {
   const total = PROJECTS.length;
   const countries = new Set(PROJECTS.map(p => {
     const r = p.region || '';
-    if (r.includes('VN') || /Hà Nội|Sài Gòn|TP\.HCM|Đà Nẵng|Quảng Nam|Cần Thơ|Hải Phòng/.test(r)) return 'VN';
+    if (r.includes('VN') || r.includes('Việt Nam') || /Hà Nội|Sài Gòn|TP\.HCM|Đà Nẵng|Quảng Nam|Cần Thơ|Hải Phòng/.test(r)) return 'VN';
     if (r.includes('KR') || r.includes('Seoul')) return 'KR';
     if (r === 'Quốc tế' || r === 'Toàn cầu' || r === 'VN + Quốc tế' || r === 'Online toàn cầu') return 'GLOBAL';
     if (r === 'Online') return 'GLOBAL';

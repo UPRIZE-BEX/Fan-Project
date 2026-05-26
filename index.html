@@ -879,13 +879,20 @@ main {
 .carousel-nav.prev { left: calc(50% - 190px); }
 .carousel-nav.next { right: calc(50% - 190px); }
 @media (max-width: 768px) {
+  #hero.carousel-shell {
+    align-items: center;
+    min-height: calc(100svh - 56px);
+  }
   #hero .grid {
     --ring-card-w: 168px;
     --ring-card-h: 230px;
+    top: 50%;
+    z-index: 16;
   }
   #hero .hero-overlay {
     width: min(94vw, 520px);
-    transform: translateY(-15vh);
+    transform: none;
+    z-index: 4;
   }
   #hero .hero-overlay p.desc {
     display: none;
@@ -904,6 +911,12 @@ main {
     font-size: 7px;
     letter-spacing: 0.12em;
     padding: 4px 7px;
+  }
+  #hero .carousel-hint {
+    z-index: 24;
+  }
+  .carousel-nav {
+    z-index: 26;
   }
   .carousel-nav.prev { left: 22px; }
   .carousel-nav.next { right: 22px; }

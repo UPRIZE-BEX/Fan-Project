@@ -718,11 +718,198 @@ main {
   .card {
     min-height: min(610px, calc(100vh - 140px));
   }
-  .card-foot {
+.card-foot {
     align-items: flex-start;
     flex-direction: column;
     gap: 8px;
   }
+}
+
+/* ===== 3D HERO RING OVERRIDE ===== */
+#hero.carousel-shell {
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12), rgba(255,90,106,0.18) 16%, transparent 38%),
+    radial-gradient(circle at 78% 76%, rgba(255,90,106,0.08), transparent 34%),
+    radial-gradient(ellipse at center, rgba(18,4,10,0.9) 0%, rgba(0,0,0,0.96) 72%);
+  cursor: grab;
+  overflow: hidden;
+  isolation: isolate;
+}
+#hero.carousel-shell.is-dragging { cursor: grabbing; }
+#hero.carousel-shell::before {
+  top: 50%;
+  bottom: auto;
+  left: 50%;
+  width: min(44vw, 440px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.42), rgba(255,90,106,0.22) 28%, transparent 68%);
+  filter: blur(10px);
+  transform: translate(-50%, -50%);
+  animation: heroGlowPulse 5.5s ease-in-out infinite;
+}
+#hero.carousel-shell::after {
+  inset: 0;
+  width: auto;
+  z-index: 12;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.82), transparent 20%, transparent 80%, rgba(0,0,0,0.82)),
+    linear-gradient(180deg, rgba(0,0,0,0.7), transparent 22%, transparent 76%, rgba(0,0,0,0.86));
+}
+@keyframes heroGlowPulse {
+  0%, 100% { opacity: .48; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: .78; transform: translate(-50%, -50%) scale(1.12); }
+}
+#hero .hero-overlay {
+  position: relative;
+  z-index: 4;
+  width: min(90vw, 820px);
+  text-shadow: 0 18px 60px rgba(0,0,0,0.95);
+  pointer-events: none;
+}
+#hero .grid {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 8;
+  display: block;
+  width: var(--ring-card-w, 240px);
+  height: var(--ring-card-h, 330px);
+  padding: 0;
+  gap: 0;
+  overflow: visible;
+  scroll-snap-type: none;
+  scroll-padding-inline: 0;
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%) translateZ(var(--ring-depth, -620px)) rotateX(-8deg) rotateY(var(--ring-rotation, 0deg));
+  will-change: transform;
+  touch-action: none;
+  user-select: none;
+}
+#hero .carousel-slide {
+  position: absolute;
+  inset: 0;
+  width: var(--ring-card-w, 240px);
+  height: var(--ring-card-h, 330px);
+  flex: none;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  opacity: 1;
+  filter: saturate(.9) contrast(1.04);
+  transition: border-color .35s ease, box-shadow .35s ease, filter .35s ease;
+}
+#hero .carousel-slide.is-active {
+  filter: saturate(1.08) brightness(1.04) contrast(1.08);
+}
+#hero .card {
+  min-height: 0;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.52);
+  transition: border-color .4s ease, box-shadow .4s ease, filter .4s ease;
+}
+#hero .card:hover {
+  border-color: rgba(255,90,106,0.55);
+  box-shadow: 0 0 34px rgba(255,90,106,0.34), 0 34px 90px rgba(0,0,0,0.56);
+  transform: none;
+}
+#hero .card-img {
+  height: 68%;
+  aspect-ratio: auto;
+}
+#hero .card-img img {
+  object-fit: cover;
+}
+#hero .card-body {
+  padding: 16px 17px 18px;
+}
+#hero .card-title {
+  font-size: 20px;
+}
+#hero .card-by {
+  font-size: 13px;
+  margin-bottom: 0;
+}
+#hero .card-desc,
+#hero .card-foot {
+  display: none;
+}
+#hero .card-type,
+#hero .card-status {
+  top: 12px;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  padding: 5px 9px;
+}
+#hero .card-type { left: 12px; }
+#hero .card-status { right: 12px; }
+#hero .carousel-hint {
+  bottom: 28px;
+  z-index: 20;
+}
+#hero .carousel-hint::after {
+  content: '';
+  width: 56px;
+  height: 1px;
+  margin: 9px auto 0;
+  background: linear-gradient(90deg, transparent, var(--rose-soft), transparent);
+  box-shadow: 0 0 12px rgba(255,90,106,0.45);
+}
+.carousel-nav {
+  position: absolute;
+  bottom: 24px;
+  z-index: 22;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: rgba(0,0,0,0.45);
+  color: var(--text-dim);
+  font-family: var(--serif);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all .3s ease;
+}
+.carousel-nav:hover {
+  border-color: var(--rose);
+  color: var(--rose-soft);
+  box-shadow: 0 0 20px rgba(255,90,106,0.28);
+}
+.carousel-nav.prev { left: calc(50% - 190px); }
+.carousel-nav.next { right: calc(50% - 190px); }
+@media (max-width: 768px) {
+  #hero .grid {
+    --ring-card-w: 168px;
+    --ring-card-h: 230px;
+  }
+  #hero .hero-overlay {
+    width: min(94vw, 520px);
+    transform: translateY(-15vh);
+  }
+  #hero .hero-overlay p.desc {
+    display: none;
+  }
+  #hero .card-title {
+    font-size: 16px;
+  }
+  #hero .card-by {
+    display: none;
+  }
+  #hero .card-body {
+    padding: 12px;
+  }
+  #hero .card-type,
+  #hero .card-status {
+    font-size: 7px;
+    letter-spacing: 0.12em;
+    padding: 4px 7px;
+  }
+  .carousel-nav.prev { left: 22px; }
+  .carousel-nav.next { right: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #hero.carousel-shell::before { animation: none; }
 }
 
 /* ===== EMPTY STATE ===== */
@@ -1129,8 +1316,7 @@ footer {
 <nav>
   <a class="logo" href="index.html" aria-label="Về trang chủ"><img src="assets/h3t.png" alt="H3T.ONLYFORCB"></a>
   <div class="nav-right">
-    <a class="nav-link" href="#intro">Tổng quan</a>
-    <a class="nav-link" href="#grid">Projects</a>
+  
     <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLSc-2ZfbVmK_86bgz4Siqrorj3fsZsMKlTqtjJLFRxIh71SDHQ/viewform" id="submitBtn">+ Đăng ký</a>
   </div>
 </nav>
@@ -1162,9 +1348,34 @@ footer {
 
 <!-- ===== PROJECT CAROUSEL ===== -->
 <main id="grid">
-  <div class="carousel-shell">
-    <div class="grid" id="gridContainer"></div>
-    <div class="carousel-hint">Vuốt để xem projects</div>
+  <div class="carousel-shell" id="hero">
+    <div class="carousel-hero hero-overlay">
+      <img class="intro-logo" src="assets/LOGO-NOTAGLINE.png" alt="BE[X]YOND Logo">
+      <p class="sub">[X] Project</p>
+      <p class="desc">Tập hợp tất cả project của FC, fansite, và fan lẻ trong umbrella campaign BE[X]YOND.<br>Từ một ánh sáng đơn độc — đến cả một bầu trời.</p>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num" id="statTotal">—</div>
+          <div class="hero-stat-label">Projects</div>
+        </div>
+        <div>
+          <div class="hero-stat-num" id="statCountries">—</div>
+          <div class="hero-stat-label">Quốc gia</div>
+        </div>
+        <div>
+          <div class="hero-stat-num" id="statCharity">—</div>
+          <div class="hero-stat-label">Thiện nguyện (₫)</div>
+        </div>
+        <div>
+          <div class="hero-stat-num" id="statReach">—</div>
+          <div class="hero-stat-label">Impressions</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid" id="gridContainer" aria-label="Project carousel"></div>
+    <button class="carousel-nav prev" id="carouselPrev" type="button" aria-label="Xoay carousel sang trái">‹</button>
+    <button class="carousel-nav next" id="carouselNext" type="button" aria-label="Xoay carousel sang phải">›</button>
+    <div class="carousel-hint">Đang xoay · kéo để điều khiển</div>
   </div>
   <div class="empty-state" id="emptyState" style="display:none;">
     <h3>Không tìm thấy project nào</h3>
@@ -2398,12 +2609,42 @@ async function resolveProjectDriveGallery(project) {
   return project;
 }
 
+function getActorFilterValue(project) {
+  if (project.actor === 'Individual') {
+    return `individual:${project.by || project.id || 'unknown'}`;
+  }
+  return project.actor || 'Khác';
+}
+
+function getActorFilterLabel(project) {
+  if (project.actor === 'Individual') return project.by || getActorLabel(project.actor);
+  return getActorLabel(project.actor);
+}
+
+function buildActorFilters() {
+  const map = new Map();
+  PROJECTS.forEach(project => {
+    const value = getActorFilterValue(project);
+    if (!value) return;
+    if (!map.has(value)) {
+      map.set(value, { value, label: getActorFilterLabel(project), count: 0, actor: project.actor });
+    }
+    map.get(value).count += 1;
+  });
+  return [...map.values()].sort((a, b) => {
+    const order = { FC: 0, FS: 1, Individual: 2 };
+    const byGroup = (order[a.actor] ?? 9) - (order[b.actor] ?? 9);
+    return byGroup || a.label.localeCompare(b.label, 'vi');
+  });
+}
+
 function rebuildFilters() {
   const types = new Set(PROJECTS.map(p => p.type));
   const actors = new Set(PROJECTS.map(p => p.actor));
+  const actorFilterValues = new Set(PROJECTS.map(getActorFilterValue));
   const statuses = new Set(PROJECTS.map(p => p.status));
   if (filterType !== 'all' && !types.has(filterType)) filterType = 'all';
-  if (filterActor !== 'all' && !actors.has(filterActor)) filterActor = 'all';
+  if (filterActor !== 'all' && !actors.has(filterActor) && !actorFilterValues.has(filterActor)) filterActor = 'all';
   if (filterStatus !== 'all' && !statuses.has(filterStatus)) filterStatus = 'all';
   ['typeFilters', 'actorFilters', 'statusFilters'].forEach(id => {
     document.getElementById(id).innerHTML = '';
@@ -2426,7 +2667,7 @@ function initFilters() {
   const actorContainer = document.getElementById('actorFilters');
   const statusContainer = document.getElementById('statusFilters');
   const types = [...new Set(PROJECTS.map(p => p.type).filter(Boolean))];
-  const actors = [...new Set(PROJECTS.map(p => p.actor).filter(Boolean))];
+  const actorFilters = buildActorFilters();
   const statuses = [...new Set(PROJECTS.map(p => p.status).filter(Boolean))];
 
   // Type filters
@@ -2444,10 +2685,9 @@ function initFilters() {
   const allActor = createFilterBtn('all', 'Mọi đối tượng', PROJECTS.length, true);
   allActor.addEventListener('click', () => { filterActor = 'all'; updateFilters('actor'); render(); });
   actorContainer.appendChild(allActor);
-  actors.forEach(a => {
-    const count = PROJECTS.filter(p => p.actor === a).length;
-    const btn = createFilterBtn(a, getActorLabel(a), count);
-    btn.addEventListener('click', () => { filterActor = a; updateFilters('actor'); render(); });
+  actorFilters.forEach(item => {
+    const btn = createFilterBtn(item.value, item.label, item.count);
+    btn.addEventListener('click', () => { filterActor = item.value; updateFilters('actor'); render(); });
     actorContainer.appendChild(btn);
   });
 
@@ -2486,7 +2726,7 @@ function getFiltered() {
   const q = searchQuery.trim().toLowerCase();
   return PROJECTS.filter(p => {
     if (filterType !== 'all' && p.type !== filterType) return false;
-    if (filterActor !== 'all' && p.actor !== filterActor) return false;
+    if (filterActor !== 'all' && p.actor !== filterActor && getActorFilterValue(p) !== filterActor) return false;
     if (filterStatus !== 'all' && p.status !== filterStatus) return false;
     if (q) {
       const text = (p.title + ' ' + p.by + ' ' + p.desc + ' ' + p.type + ' ' + p.region).toLowerCase();
@@ -2535,6 +2775,7 @@ function createHeroSlide(isClone = false) {
 function createProjectCard(p, extraClass = '', options = {}) {
   const card = document.createElement('div');
   card.className = `carousel-slide card ${extraClass}`.trim();
+  card.__project = p;
   const key = `project-${p.id}`;
   card.dataset.carouselKey = options.key || key;
   if (options.clone) {
@@ -2564,7 +2805,8 @@ function createProjectCard(p, extraClass = '', options = {}) {
   card.addEventListener('pointerdown', e => { downY = e.clientY; });
   card.addEventListener('click', e => {
     if (Math.abs(e.clientX - downX) > 8 || Math.abs(e.clientY - downY) > 8) return;
-    openModal(p);
+    if (card.closest('#hero')) return;
+    openProjectFromRing(p, card);
   });
 
   return card;
@@ -2749,7 +2991,293 @@ function initCarouselDrag() {
 document.getElementById('gridContainer').addEventListener('scroll', () => {
   requestAnimationFrame(updateCarouselActive);
 }, { passive: true });
-initCarouselDrag();
+// Replaced by the 3D ring drag handler below.
+
+// ============ 3D HERO RING ============
+let heroRingRotation = 0;
+let heroRingVelocity = 0;
+let heroRingAutoSpin = true;
+let heroRingFrame = null;
+let heroRingIdleTimer = null;
+let heroRingAngleStep = 0;
+let heroRingRadius = 620;
+let heroRingCenterFrame = null;
+
+function isProjectOverlayOpen() {
+  return document.getElementById('modal')?.classList.contains('show') ||
+    document.getElementById('lightbox')?.classList.contains('show');
+}
+
+function pauseHeroRing(ms = 3000, stopMomentum = true) {
+  heroRingAutoSpin = false;
+  if (stopMomentum) heroRingVelocity = 0;
+  clearTimeout(heroRingIdleTimer);
+  heroRingIdleTimer = setTimeout(() => {
+    if (!isProjectOverlayOpen()) heroRingAutoSpin = true;
+  }, ms);
+}
+
+function resumeHeroRingNow() {
+  clearTimeout(heroRingIdleTimer);
+  heroRingVelocity = 0;
+  heroRingAutoSpin = true;
+}
+
+function layoutHeroRing() {
+  const container = document.getElementById('gridContainer');
+  if (!container || container.style.display === 'none') return;
+  const slides = [...container.querySelectorAll('.carousel-slide')];
+  const count = slides.length;
+  if (!count) return;
+
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const cardWidth = isMobile ? 168 : 240;
+  const cardHeight = isMobile ? 230 : 330;
+  heroRingAngleStep = 360 / count;
+  heroRingRadius = Math.round((cardWidth / 2) / Math.tan(Math.PI / count) + (isMobile ? 120 : 230));
+
+  container.style.setProperty('--ring-card-w', `${cardWidth}px`);
+  container.style.setProperty('--ring-card-h', `${cardHeight}px`);
+  container.style.setProperty('--ring-radius', `${heroRingRadius}px`);
+  container.style.setProperty('--ring-depth', `${heroRingRadius * -1}px`);
+  slides.forEach((slide, index) => {
+    slide.dataset.ringIndex = String(index);
+    slide.style.transform = `rotateY(${index * heroRingAngleStep}deg) translateZ(${heroRingRadius}px)`;
+  });
+}
+
+function applyHeroRingTransform() {
+  const container = document.getElementById('gridContainer');
+  if (!container) return;
+  container.style.setProperty('--ring-rotation', `${heroRingRotation}deg`);
+}
+
+function updateCarouselActive() {
+  const container = document.getElementById('gridContainer');
+  if (!container || container.style.display === 'none' || !heroRingAngleStep) return;
+  const slides = [...container.querySelectorAll('.carousel-slide')];
+  if (!slides.length) return;
+  const normalized = ((-heroRingRotation % 360) + 360) % 360;
+  const activeIndex = Math.round(normalized / heroRingAngleStep) % slides.length;
+  slides.forEach(slide => {
+    slide.classList.toggle('is-active', Number(slide.dataset.ringIndex) === activeIndex);
+  });
+}
+
+function spinCarousel(delta) {
+  heroRingVelocity += delta;
+  pauseHeroRing(3000, false);
+}
+
+function shortestAngleDelta(from, to) {
+  return ((to - from + 540) % 360) - 180;
+}
+
+function normalizeRingAngle(value) {
+  return ((value % 360) + 540) % 360 - 180;
+}
+
+function getRingCardDepth(card) {
+  const index = Number(card.dataset.ringIndex);
+  if (!Number.isFinite(index) || !heroRingAngleStep) return -1;
+  const angle = normalizeRingAngle(index * heroRingAngleStep + heroRingRotation);
+  return Math.cos(angle * Math.PI / 180);
+}
+
+function getRingCardAtPoint(x, y) {
+  const container = document.getElementById('gridContainer');
+  if (!container) return null;
+  const cards = [...container.querySelectorAll('.carousel-slide.card')];
+  let best = null;
+  let bestScore = -Infinity;
+
+  cards.forEach(card => {
+    const rect = card.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = x - cx;
+    const dy = y - cy;
+    const distance = Math.hypot(dx, dy);
+    const contains = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    const maxDistance = Math.max(rect.width, rect.height) * 0.62;
+    if (!contains && distance > maxDistance) return;
+
+    const depth = getRingCardDepth(card);
+    if (depth < -0.2) return;
+    const distancePenalty = distance / Math.max(1, Math.max(rect.width, rect.height));
+    const score = (contains ? 4 : 0) + depth * 3 - distancePenalty;
+    if (score > bestScore) {
+      bestScore = score;
+      best = card;
+    }
+  });
+
+  return best;
+}
+
+function centerRingCard(card, done) {
+  if (!card || !heroRingAngleStep) {
+    done?.();
+    return;
+  }
+  const index = Number(card.dataset.ringIndex);
+  if (!Number.isFinite(index)) {
+    done?.();
+    return;
+  }
+
+  cancelAnimationFrame(heroRingCenterFrame);
+  pauseHeroRing();
+  heroRingVelocity = 0;
+
+  const start = heroRingRotation;
+  const targetBase = index * -heroRingAngleStep;
+  const target = start + shortestAngleDelta(start, targetBase);
+  const duration = 520;
+  const startedAt = performance.now();
+
+  function tick(now) {
+    const progress = Math.min(1, (now - startedAt) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    heroRingRotation = start + (target - start) * eased;
+    applyHeroRingTransform();
+    updateCarouselActive();
+    if (progress < 1) {
+      heroRingCenterFrame = requestAnimationFrame(tick);
+      return;
+    }
+    heroRingRotation = target;
+    applyHeroRingTransform();
+    updateCarouselActive();
+    done?.();
+  }
+
+  heroRingCenterFrame = requestAnimationFrame(tick);
+}
+
+function openProjectFromRing(project, card) {
+  centerRingCard(card, () => {
+    openModal(project);
+  });
+}
+
+function moveCarouselByKeyboard(direction) {
+  spinCarousel(direction * -18);
+}
+
+document.addEventListener('pointerdown', e => {
+  if (isProjectOverlayOpen()) return;
+  if (getRingCardAtPoint(e.clientX, e.clientY)) return;
+  pauseHeroRing();
+}, { capture: true, passive: true });
+
+function startHeroRingLoop() {
+  if (heroRingFrame) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function loop() {
+    if (!reduceMotion) {
+      if (heroRingAutoSpin && Math.abs(heroRingVelocity) < 0.01) {
+        heroRingRotation -= 0.12;
+      } else {
+        heroRingRotation += heroRingVelocity;
+        heroRingVelocity *= 0.94;
+        if (Math.abs(heroRingVelocity) < 0.01) heroRingVelocity = 0;
+      }
+      applyHeroRingTransform();
+      updateCarouselActive();
+    }
+    heroRingFrame = requestAnimationFrame(loop);
+  }
+  heroRingFrame = requestAnimationFrame(loop);
+}
+
+function initHeroRingDrag() {
+  const shell = document.getElementById('hero');
+  if (!shell || shell.dataset.ringReady === 'true') return;
+  shell.dataset.ringReady = 'true';
+
+  let isDown = false;
+  let lastX = 0;
+  let startX = 0;
+  let startY = 0;
+  let dragDistance = 0;
+  function endDrag(e) {
+    if (!isDown) return;
+    isDown = false;
+    shell.classList.remove('is-dragging');
+    shell.releasePointerCapture?.(e.pointerId);
+    pauseHeroRing();
+    if (dragDistance <= 8 && !e.target.closest?.('.carousel-nav')) {
+      const card = getRingCardAtPoint(e.clientX, e.clientY);
+      if (card?.__project) openProjectFromRing(card.__project, card);
+    }
+  }
+
+  shell.addEventListener('pointerdown', e => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    isDown = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    lastX = e.clientX;
+    dragDistance = 0;
+    pauseHeroRing();
+    shell.classList.add('is-dragging');
+    shell.setPointerCapture?.(e.pointerId);
+  });
+  shell.addEventListener('pointermove', e => {
+    if (!isDown) return;
+    e.preventDefault();
+    const dx = e.clientX - lastX;
+    lastX = e.clientX;
+    dragDistance = Math.max(dragDistance, Math.hypot(e.clientX - startX, e.clientY - startY));
+    heroRingRotation += dx * 0.4;
+    heroRingVelocity = dx * 0.4;
+    applyHeroRingTransform();
+    updateCarouselActive();
+  });
+  shell.addEventListener('pointerup', endDrag);
+  shell.addEventListener('pointercancel', endDrag);
+  shell.addEventListener('pointerleave', endDrag);
+  document.getElementById('carouselPrev')?.addEventListener('click', () => spinCarousel(-heroRingAngleStep * 0.45));
+  document.getElementById('carouselNext')?.addEventListener('click', () => spinCarousel(heroRingAngleStep * 0.45));
+  window.addEventListener('resize', () => {
+    layoutHeroRing();
+    applyHeroRingTransform();
+    updateCarouselActive();
+  });
+  startHeroRingLoop();
+}
+
+function render() {
+  const filtered = getFiltered();
+  const container = document.getElementById('gridContainer');
+  const shell = container.closest('.carousel-shell');
+  const empty = document.getElementById('emptyState');
+  container.innerHTML = '';
+
+  if (filtered.length === 0) {
+    empty.style.display = 'block';
+    shell.style.display = 'none';
+    container.style.display = 'none';
+  } else {
+    empty.style.display = 'none';
+    shell.style.display = 'flex';
+    container.style.display = 'block';
+    filtered.forEach(p => {
+      container.appendChild(createProjectCard(p));
+    });
+  }
+
+  document.getElementById('resultCount').textContent = `${filtered.length} / ${PROJECTS.length} projects`;
+  requestAnimationFrame(() => {
+    layoutHeroRing();
+    applyHeroRingTransform();
+    updateCarouselActive();
+    initStats();
+  });
+}
+
+initHeroRingDrag();
 
 // ============ MODAL ============
 let currentGallery = [];
@@ -2847,6 +3375,7 @@ function openModal(p) {
 function closeModal() {
   document.getElementById('modal').classList.remove('show');
   document.body.style.overflow = '';
+  resumeHeroRingNow();
 }
 
 // ============ LIGHTBOX ============
@@ -2868,6 +3397,7 @@ function showLightboxImg() {
 
 function closeLightbox() {
   document.getElementById('lightbox').classList.remove('show');
+  resumeHeroRingNow();
 }
 
 function lightboxNext() {

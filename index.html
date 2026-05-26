@@ -120,8 +120,9 @@ nav .nav-cta {
 nav .nav-cta:hover { background: rgba(255,90,106,0.2); color: #fff; }
 @media (max-width: 768px) {
   nav { padding: 14px 20px; }
+  nav .nav-right { margin-left: auto; min-width: 0; }
   nav .nav-link { display: none; }
-  nav .nav-cta { padding: 8px 14px; font-size: 9px; letter-spacing: 0.2em; }
+  nav .nav-cta { max-width: 128px; padding: 8px 14px; font-size: 9px; letter-spacing: 0.2em; overflow: hidden; white-space: nowrap; }
 }
 
 /* ===== INTRO ===== */
@@ -148,6 +149,7 @@ nav .nav-cta:hover { background: rgba(255,90,106,0.2); color: #fff; }
   transition: opacity .8s ease, visibility .8s ease;
 }
 .intro.hidden { display: none; opacity: 0; visibility: hidden; pointer-events: none; }
+.intro-anchor { scroll-margin-top: 90px; }
 .intro-logo {
   display: block;
   width: min(640px, calc(100vw - 48px));
@@ -395,16 +397,135 @@ nav .nav-cta:hover { background: rgba(255,90,106,0.2); color: #fff; }
   .toolbar-meta { display: none; }
 }
 
-/* ===== GRID ===== */
+/* ===== PROJECT CAROUSEL ===== */
 main {
-  max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
-  padding: 48px 44px 80px;
+  padding: 0 0 80px;
+  overflow: hidden;
+}
+.carousel-shell {
+  position: relative;
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,90,106,0.18), transparent 34%),
+    radial-gradient(ellipse at center, rgba(18,4,10,0.9) 0%, rgba(0,0,0,0.96) 72%);
+  perspective: 1400px;
+}
+.carousel-shell::before,
+.carousel-shell::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18vw;
+  z-index: 4;
+  pointer-events: none;
+}
+.carousel-shell::before {
+  left: 0;
+  background: linear-gradient(90deg, #000 0%, rgba(0,0,0,0.72) 42%, transparent 100%);
+}
+.carousel-shell::after {
+  right: 0;
+  background: linear-gradient(270deg, #000 0%, rgba(0,0,0,0.72) 42%, transparent 100%);
 }
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: clamp(22px, 4vw, 72px);
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 58px max(18px, calc((100vw - min(760px, 72vw)) / 2)) 70px;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: max(18px, calc((100vw - min(760px, 72vw)) / 2));
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  cursor: grab;
+  user-select: none;
+}
+.grid::-webkit-scrollbar { display: none; }
+.grid.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+}
+.grid.is-jumping {
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+}
+.carousel-slide {
+  flex: 0 0 min(760px, 72vw);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  transition: opacity .45s ease, transform .45s ease, filter .45s ease;
+  transform: translateZ(0) scale(.82) rotateY(var(--tilt, 0deg));
+  opacity: .42;
+  filter: saturate(.72) brightness(.58);
+}
+.carousel-slide.is-active {
+  opacity: 1;
+  filter: saturate(1) brightness(1);
+  transform: translateZ(80px) scale(1) rotateY(0deg);
+}
+.hero-slide {
+  min-height: min(620px, calc(100vh - 170px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carousel-hero {
+  width: 100%;
+  text-align: center;
+  padding: 0 22px;
+}
+.carousel-hero .intro-logo {
+  width: min(680px, 100%);
+  max-height: 23vh;
+  margin: 0 auto 14px;
+}
+.carousel-hero p.sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(22px, 3vw, 34px);
+  color: var(--silver);
+  letter-spacing: 0.03em;
+  margin-bottom: 20px;
+}
+.carousel-hero p.desc {
+  font-family: var(--serif);
+  font-size: clamp(16px, 1.5vw, 20px);
+  color: var(--text-dim);
+  max-width: 820px;
+  line-height: 1.7;
+  margin: 0 auto 32px;
+}
+.carousel-hint {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  z-index: 5;
+  transform: translateX(-50%);
+  font-family: var(--sans);
+  font-size: 9px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+.carousel-hint::after {
+  content: '›';
+  display: block;
+  margin-top: 4px;
+  color: var(--rose-soft);
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1;
 }
 .card {
   background: var(--bg-card);
@@ -415,6 +536,8 @@ main {
   flex-direction: column;
   transition: all .5s ease;
   position: relative;
+  min-height: min(650px, calc(100vh - 170px));
+  box-shadow: 0 34px 90px rgba(0,0,0,0.45);
 }
 .card::before {
   content: '';
@@ -429,14 +552,20 @@ main {
 }
 .card:hover {
   border-color: rgba(255,90,106,0.35);
-  transform: translateY(-4px);
+  transform: translateY(-6px);
+}
+.carousel-slide.card:not(.is-active):hover {
+  transform: translateZ(0) translateY(-4px) scale(.86) rotateY(var(--tilt, 0deg));
+}
+.carousel-slide.card.is-active:hover {
+  transform: translateZ(96px) translateY(-6px) scale(1) rotateY(0deg);
 }
 .card:hover::before { transform: scaleX(1); }
 .card:hover .card-img img { transform: scale(1.02); }
 
 .card-img {
   position: relative;
-  aspect-ratio: 16/10;
+  aspect-ratio: 16/11;
   overflow: hidden;
   background: #000;
 }
@@ -447,6 +576,8 @@ main {
   object-position: center;
   transition: transform .8s cubic-bezier(0.2, 0.8, 0.2, 1);
   display: block;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 .card-img::after {
   content: '';
@@ -489,14 +620,14 @@ main {
 .card-status.done { color: var(--text-dim); border-color: var(--line); }
 
 .card-body {
-  padding: 20px 22px 22px;
+  padding: clamp(20px, 2.4vw, 30px);
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 .card-title {
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: clamp(22px, 2.3vw, 34px);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text);
@@ -506,19 +637,18 @@ main {
 .card-by {
   font-family: var(--serif);
   font-style: italic;
-  font-size: 13px;
+  font-size: clamp(14px, 1.2vw, 17px);
   color: var(--text-faint);
   margin-bottom: 14px;
 }
 .card-desc {
   font-family: var(--serif);
-  font-size: 14px;
-  color: var(--text-dim);
-  line-height: 1.55;
+  font-size: clamp(15px, 1.25vw, 18px);
+  color: rgba(245,240,236,0.62);
+  line-height: 1.65;
   flex: 1;
-  /* Clamp to 2 lines on grid */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -544,6 +674,55 @@ main {
   content: '●';
   color: var(--rose);
   font-size: 8px;
+}
+@media (max-width: 768px) {
+  main { padding-bottom: 48px; }
+  .carousel-shell {
+    min-height: calc(100vh - 56px);
+    align-items: flex-start;
+  }
+  .grid {
+    gap: 18px;
+    padding-top: 42px;
+    padding-bottom: 58px;
+  }
+  .carousel-slide {
+    flex-basis: min(82vw, 420px);
+    transform: translateZ(0) scale(.88);
+  }
+  .hero-slide {
+    flex-basis: 92vw;
+  }
+  .hero-slide {
+    min-height: min(560px, calc(100vh - 150px));
+  }
+  .carousel-hero .intro-logo {
+    width: min(330px, calc(100vw - 72px));
+    max-height: 18vh;
+  }
+  .carousel-hero p.desc {
+    max-width: 92%;
+  }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(320px, 100%);
+    gap: 22px 18px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero-stat-label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+  }
+  .card {
+    min-height: min(610px, calc(100vh - 140px));
+  }
+  .card-foot {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 
 /* ===== EMPTY STATE ===== */
@@ -956,30 +1135,8 @@ footer {
   </div>
 </nav>
 
-<!-- Intro overlay -->
-<div class="intro" id="intro">
-  <img class="intro-logo" src="assets/LOGO-NOTAGLINE.png" alt="BE[X]YOND Logo">
-  <p class="sub">[X] Project</p>
-  <p class="desc">Tập hợp tất cả project của FC, fansite, và fan lẻ trong umbrella campaign BE[X]YOND.<br>Từ một ánh sáng đơn độc — đến cả một bầu trời.</p>
-  <div class="hero-stats">
-    <div>
-      <div class="hero-stat-num" id="statTotal">—</div>
-      <div class="hero-stat-label">Projects</div>
-    </div>
-    <div>
-      <div class="hero-stat-num" id="statCountries">—</div>
-      <div class="hero-stat-label">Quốc gia</div>
-    </div>
-    <div>
-      <div class="hero-stat-num" id="statCharity">—</div>
-      <div class="hero-stat-label">Thiện nguyện (₫)</div>
-    </div>
-    <div>
-      <div class="hero-stat-num" id="statReach">—</div>
-      <div class="hero-stat-label">Impressions</div>
-    </div>
-  </div>
-</div>
+<!-- Intro anchor; hero content is rendered as the first carousel slide -->
+<div class="intro-anchor" id="intro"></div>
 
 <!-- ===== TOOLBAR (search + filters) ===== -->
 <div class="toolbar">
@@ -1003,9 +1160,12 @@ footer {
   </div>
 </div>
 
-<!-- ===== GRID ===== -->
+<!-- ===== PROJECT CAROUSEL ===== -->
 <main id="grid">
-  <div class="grid" id="gridContainer"></div>
+  <div class="carousel-shell">
+    <div class="grid" id="gridContainer"></div>
+    <div class="carousel-hint">Vuốt để xem projects</div>
+  </div>
   <div class="empty-state" id="emptyState" style="display:none;">
     <h3>Không tìm thấy project nào</h3>
     <p>Thử chọn lại bộ lọc, hoặc dùng từ khoá khác để tìm trong bầu trời này.</p>
@@ -2336,44 +2496,260 @@ function getFiltered() {
   });
 }
 
+function createHeroSlide(isClone = false) {
+  const hero = document.createElement('section');
+  hero.className = `carousel-slide hero-slide${isClone ? ' is-clone' : ' is-active'}`;
+  hero.dataset.carouselKey = isClone ? 'clone-hero' : 'hero';
+  if (isClone) {
+    hero.dataset.clone = 'true';
+    hero.dataset.loopTarget = 'hero';
+  }
+  hero.innerHTML = `
+    <div class="carousel-hero">
+      <img class="intro-logo" src="assets/LOGO-NOTAGLINE.png" alt="BE[X]YOND Logo">
+      <p class="sub">[X] Project</p>
+      <p class="desc">Tập hợp tất cả project của FC, fansite, và fan lẻ trong umbrella campaign BE[X]YOND.<br>Từ một ánh sáng đơn độc — đến cả một bầu trời.</p>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num"${isClone ? '' : ' id="statTotal"'}>—</div>
+          <div class="hero-stat-label">Projects</div>
+        </div>
+        <div>
+          <div class="hero-stat-num"${isClone ? '' : ' id="statCountries"'}>—</div>
+          <div class="hero-stat-label">Quốc gia</div>
+        </div>
+        <div>
+          <div class="hero-stat-num"${isClone ? '' : ' id="statCharity"'}>—</div>
+          <div class="hero-stat-label">Thiện nguyện (₫)</div>
+        </div>
+        <div>
+          <div class="hero-stat-num"${isClone ? '' : ' id="statReach"'}>—</div>
+          <div class="hero-stat-label">Impressions</div>
+        </div>
+      </div>
+    </div>
+  `;
+  return hero;
+}
+
+function createProjectCard(p, extraClass = '', options = {}) {
+  const card = document.createElement('div');
+  card.className = `carousel-slide card ${extraClass}`.trim();
+  const key = `project-${p.id}`;
+  card.dataset.carouselKey = options.key || key;
+  if (options.clone) {
+    card.dataset.clone = 'true';
+    card.dataset.loopTarget = key;
+  }
+  card.innerHTML = `
+    <div class="card-img">
+      <img src="${escapeHTML(p.img)}" alt="${escapeHTML(p.title)}" loading="lazy">
+      <div class="card-type">${escapeHTML(p.type)}</div>
+      <div class="card-status ${safeClassName(p.status)}">${escapeHTML(getStatusLabel(p.status))}</div>
+    </div>
+    <div class="card-body">
+      <div class="card-title">${escapeHTML(p.title)}</div>
+      <div class="card-by">by ${escapeHTML(p.by)}</div>
+      <div class="card-desc">${escapeHTML(p.desc)}</div>
+      <div class="card-foot">
+        <span class="region">${escapeHTML(p.region)}</span>
+        <span>${escapeHTML(p.date)}</span>
+      </div>
+    </div>
+  `;
+
+  let downX = 0;
+  let downY = 0;
+  card.addEventListener('pointerdown', e => { downX = e.clientX; });
+  card.addEventListener('pointerdown', e => { downY = e.clientY; });
+  card.addEventListener('click', e => {
+    if (Math.abs(e.clientX - downX) > 8 || Math.abs(e.clientY - downY) > 8) return;
+    openModal(p);
+  });
+
+  return card;
+}
+
+function centerCarouselSlide(slide, behavior = 'auto') {
+  const container = document.getElementById('gridContainer');
+  if (!container || !slide) return;
+  container.scrollTo({
+    left: slide.offsetLeft - (container.clientWidth - slide.offsetWidth) / 2,
+    behavior,
+  });
+}
+
+function moveCarouselByKeyboard(direction) {
+  const container = document.getElementById('gridContainer');
+  if (!container || container.style.display === 'none') return;
+  const slides = [...container.querySelectorAll('.carousel-slide')];
+  if (!slides.length) return;
+
+  const active = container.querySelector('.carousel-slide.is-active') || slides[0];
+  const currentIndex = Math.max(0, slides.indexOf(active));
+  const nextIndex = Math.max(0, Math.min(slides.length - 1, currentIndex + direction));
+  centerCarouselSlide(slides[nextIndex], 'smooth');
+}
+
 function render() {
   const filtered = getFiltered();
   const container = document.getElementById('gridContainer');
+  const shell = container.closest('.carousel-shell');
   const empty = document.getElementById('emptyState');
   container.innerHTML = '';
 
   if (filtered.length === 0) {
     empty.style.display = 'block';
+    shell.style.display = 'none';
     container.style.display = 'none';
   } else {
     empty.style.display = 'none';
-    container.style.display = 'grid';
-    filtered.forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="card-img">
-          <img src="${escapeHTML(p.img)}" alt="${escapeHTML(p.title)}" loading="lazy">
-          <div class="card-type">${escapeHTML(p.type)}</div>
-          <div class="card-status ${safeClassName(p.status)}">${escapeHTML(getStatusLabel(p.status))}</div>
-        </div>
-        <div class="card-body">
-          <div class="card-title">${escapeHTML(p.title)}</div>
-          <div class="card-by">by ${escapeHTML(p.by)}</div>
-          <div class="card-desc">${escapeHTML(p.desc)}</div>
-          <div class="card-foot">
-            <span class="region">${escapeHTML(p.region)}</span>
-            <span>${escapeHTML(p.date)}</span>
+    shell.style.display = 'flex';
+    container.style.display = 'flex';
+
+    filtered.slice(-2).forEach(p => {
+      container.appendChild(createProjectCard(p, 'is-leading-clone is-clone', { clone: true }));
+    });
+
+    const hero = document.createElement('section');
+    hero.className = 'carousel-slide hero-slide is-active';
+    hero.dataset.carouselKey = 'hero';
+    hero.innerHTML = `
+      <div class="carousel-hero">
+        <img class="intro-logo" src="assets/LOGO-NOTAGLINE.png" alt="BE[X]YOND Logo">
+        <p class="sub">[X] Project</p>
+        <p class="desc">Tập hợp tất cả project của FC, fansite, và fan lẻ trong umbrella campaign BE[X]YOND.<br>Từ một ánh sáng đơn độc — đến cả một bầu trời.</p>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num" id="statTotal">—</div>
+            <div class="hero-stat-label">Projects</div>
+          </div>
+          <div>
+            <div class="hero-stat-num" id="statCountries">—</div>
+            <div class="hero-stat-label">Quốc gia</div>
+          </div>
+          <div>
+            <div class="hero-stat-num" id="statCharity">—</div>
+            <div class="hero-stat-label">Thiện nguyện (₫)</div>
+          </div>
+          <div>
+            <div class="hero-stat-num" id="statReach">—</div>
+            <div class="hero-stat-label">Impressions</div>
           </div>
         </div>
-      `;
-      card.addEventListener('click', () => openModal(p));
-      container.appendChild(card);
+      </div>
+    `;
+    container.appendChild(hero);
+
+    filtered.forEach(p => {
+      container.appendChild(createProjectCard(p));
+    });
+
+    container.appendChild(createHeroSlide(true));
+    filtered.slice(0, 2).forEach(p => {
+      container.appendChild(createProjectCard(p, 'is-trailing-clone is-clone', { clone: true }));
     });
   }
 
   document.getElementById('resultCount').textContent = `${filtered.length} / ${PROJECTS.length} projects`;
+  requestAnimationFrame(() => {
+    const hero = container.querySelector('.hero-slide');
+    if (hero) {
+      centerCarouselSlide(hero);
+    }
+    updateCarouselActive();
+    initStats();
+  });
 }
+
+let carouselLoopTimer = null;
+let carouselIsJumping = false;
+
+function updateCarouselActive() {
+  const container = document.getElementById('gridContainer');
+  if (!container || container.style.display === 'none') return;
+  const slides = [...container.querySelectorAll('.carousel-slide')];
+  const center = container.scrollLeft + container.clientWidth / 2;
+  let active = slides[0];
+  let smallest = Infinity;
+
+  slides.forEach(slide => {
+    const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+    const distance = Math.abs(center - slideCenter);
+    const direction = slideCenter < center ? -1 : 1;
+    const strength = Math.min(1, distance / Math.max(1, container.clientWidth));
+    slide.style.setProperty('--tilt', `${direction * Math.min(16, strength * 28)}deg`);
+    if (distance < smallest) {
+      smallest = distance;
+      active = slide;
+    }
+  });
+
+  slides.forEach(slide => slide.classList.toggle('is-active', slide === active));
+  scheduleCarouselLoop(active);
+}
+
+function scheduleCarouselLoop(active) {
+  clearTimeout(carouselLoopTimer);
+  if (!active || !active.dataset.clone || carouselIsJumping) return;
+  carouselLoopTimer = setTimeout(() => {
+    const container = document.getElementById('gridContainer');
+    const targetKey = active.dataset.loopTarget;
+    const escapedKey = window.CSS?.escape ? CSS.escape(targetKey) : String(targetKey).replace(/["\\]/g, '\\$&');
+    const target = container.querySelector(`.carousel-slide[data-carousel-key="${escapedKey}"]:not([data-clone="true"])`);
+    if (!target) return;
+    carouselIsJumping = true;
+    container.classList.add('is-jumping');
+    centerCarouselSlide(target);
+    requestAnimationFrame(() => {
+      updateCarouselActive();
+      container.classList.remove('is-jumping');
+      carouselIsJumping = false;
+    });
+  }, 140);
+}
+
+function initCarouselDrag() {
+  const container = document.getElementById('gridContainer');
+  let isDown = false;
+  let startX = 0;
+  let startScrollLeft = 0;
+
+  container.addEventListener('pointerdown', e => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    isDown = true;
+    startX = e.clientX;
+    startScrollLeft = container.scrollLeft;
+    container.classList.add('is-dragging');
+    container.setPointerCapture?.(e.pointerId);
+  });
+
+  container.addEventListener('pointermove', e => {
+    if (!isDown) return;
+    e.preventDefault();
+    container.scrollLeft = startScrollLeft - (e.clientX - startX);
+  });
+
+  function endDrag(e) {
+    if (!isDown) return;
+    isDown = false;
+    container.classList.remove('is-dragging');
+    container.releasePointerCapture?.(e.pointerId);
+    requestAnimationFrame(() => {
+      const active = container.querySelector('.carousel-slide.is-active');
+      centerCarouselSlide(active, 'smooth');
+    });
+  }
+
+  container.addEventListener('pointerup', endDrag);
+  container.addEventListener('pointercancel', endDrag);
+  container.addEventListener('pointerleave', endDrag);
+}
+
+document.getElementById('gridContainer').addEventListener('scroll', () => {
+  requestAnimationFrame(updateCarouselActive);
+}, { passive: true });
+initCarouselDrag();
 
 // ============ MODAL ============
 let currentGallery = [];
@@ -2528,6 +2904,17 @@ document.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft') lightboxPrev();
     return;
   }
+  if (document.getElementById('modal').classList.contains('show')) {
+    if (e.key === 'Escape') closeModal();
+    return;
+  }
+  const tag = document.activeElement?.tagName?.toLowerCase();
+  const isTyping = tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable;
+  if (!isTyping && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    e.preventDefault();
+    moveCarouselByKeyboard(e.key === 'ArrowRight' ? 1 : -1);
+    return;
+  }
   if (e.key === 'Escape') closeModal();
 });
 
@@ -2600,13 +2987,14 @@ async function initProjectsData() {
     return;
   }
 
+  await setProjects(FALLBACK_PROJECTS);
+
   try {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     await loadProjectsFromSupabase();
     subscribeProjectsRealtime();
   } catch (error) {
     console.error('Unable to load Supabase projects:', error);
-    await setProjects(FALLBACK_PROJECTS);
   }
 }
 
@@ -2636,7 +3024,7 @@ function animateNumber(el, target, duration = 1200, formatter = (v) => v) {
   const startTime = performance.now();
   function tick(now) {
     const elapsed = now - startTime;
-    const progress = Math.min(1, elapsed / duration);
+    const progress = Math.max(0, Math.min(1, elapsed / duration));
     const eased = 1 - Math.pow(1 - progress, 3);
     const value = Math.floor(start + (target - start) * eased);
     el.textContent = formatter(value);
@@ -2648,12 +3036,17 @@ function animateNumber(el, target, duration = 1200, formatter = (v) => v) {
 
 function initStats() {
   const s = computeStats();
-  animateNumber(document.getElementById('statTotal'), s.total);
-  animateNumber(document.getElementById('statCountries'), s.countries);
-  animateNumber(document.getElementById('statCharity'), s.charity,
+  const totalEl = document.getElementById('statTotal');
+  const countriesEl = document.getElementById('statCountries');
+  const charityEl = document.getElementById('statCharity');
+  const reachEl = document.getElementById('statReach');
+  if (!totalEl || !countriesEl || !charityEl || !reachEl) return;
+  animateNumber(totalEl, s.total);
+  animateNumber(countriesEl, s.countries);
+  animateNumber(charityEl, s.charity,
     1500, v => (v / 1000000).toFixed(0) + 'M');
   // Estimate impressions
-  animateNumber(document.getElementById('statReach'), 5200000,
+  animateNumber(reachEl, 5200000,
     1500, v => (v / 1000000).toFixed(1) + 'M');
 }
 

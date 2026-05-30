@@ -292,7 +292,8 @@ nav .nav-cta:hover { background: rgba(255,90,106,0.2); color: #fff; }
 
 /* ===== GRID VIEW MODE ===== */
 .projects-grid-wrapper {
-  padding: 44px;
+  margin-top: -210px;
+  padding: 14px 44px 28px;
   background: var(--bg-0);
   border-top: 1px solid var(--line);
 }
@@ -534,8 +535,8 @@ main {
 
 /* Grid view mode adjustments */
 .carousel-shell[data-grid-mode="true"] {
-  min-height: auto;
-  padding: 60px 44px 40px;
+  min-height: min(640px, 82vh);
+  padding: 44px 44px 24px;
   align-items: flex-start;
 }
 
@@ -2874,7 +2875,7 @@ function createGridCard(p) {
 
 function renderGridView() {
   const container = document.getElementById('projectsGridContainer');
-  const gridShell = document.getElementById('gridViewShell');
+  const gridShell = document.getElementById('gridViewWrapper');
   const empty = document.getElementById('emptyState');
   const main = document.getElementById('grid');
 
@@ -2953,6 +2954,11 @@ function switchView(view) {
 }
 
 function render() {
+  if (currentView === 'grid') {
+    renderGridView();
+    return;
+  }
+
   const filtered = getFiltered();
   const container = document.getElementById('gridContainer');
   const shell = container.closest('.carousel-shell');

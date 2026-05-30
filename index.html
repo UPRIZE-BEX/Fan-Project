@@ -266,6 +266,122 @@ nav .nav-cta:hover { background: rgba(255,90,106,0.2); color: #fff; }
   }
 }
 
+/* ===== VIEW TOGGLE ===== */
+.view-toggle-btn {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.02);
+  color: var(--text-dim);
+  font-family: var(--sans);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all .3s;
+  white-space: nowrap;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.view-toggle-btn:hover {
+  border-color: rgba(255,90,106,0.4);
+  color: var(--rose-soft);
+  background: rgba(255,90,106,0.08);
+}
+
+@media (max-width: 768px) {
+  .view-toggle-btn { padding: 8px 10px; font-size: 11px; margin-left: 8px; }
+}
+
+/* ===== GRID VIEW MODE ===== */
+.projects-grid-wrapper {
+  padding: 44px;
+  background: var(--bg-0);
+  border-top: 1px solid var(--line);
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0;
+  position: relative;
+}
+
+.projects-grid .grid-card {
+  display: block;
+  flex: none;
+  opacity: 1;
+  filter: none;
+  transform: none;
+  transition: all .3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.projects-grid .grid-card:hover {
+  transform: translateY(-8px);
+}
+
+.projects-grid .grid-card:hover .card {
+  border-color: rgba(255,90,106,0.5);
+  box-shadow: 0 16px 48px rgba(255,90,106,0.2);
+}
+
+.projects-grid .grid-card:hover .card-img img {
+  transform: scale(1.03);
+}
+
+.projects-grid .card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+}
+
+.projects-grid .card-img {
+  aspect-ratio: 16/9;
+  min-height: 200px;
+  flex: 0 0 auto;
+}
+
+.projects-grid .card-body {
+  flex: 1;
+}
+
+@media (max-width: 1200px) {
+  .projects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .projects-grid-wrapper {
+    padding: 20px;
+  }
+  .projects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .projects-grid-wrapper {
+    padding: 16px;
+  }
+  .projects-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .projects-grid .card-img {
+    min-height: 160px;
+  }
+}
+
 /* ===== TOOLBAR (search + filters) ===== */
 .toolbar {
   position: sticky;
@@ -278,6 +394,7 @@ nav .nav-cta:hover { background: rgba(255,90,106,0.2); color: #fff; }
 }
 .toolbar-row {
   display: flex;
+  align-items: center;
   gap: 16px;
   max-width: 1400px;
   margin: 0 auto;
@@ -413,6 +530,23 @@ main {
     radial-gradient(circle at 50% 18%, rgba(255,90,106,0.18), transparent 34%),
     radial-gradient(ellipse at center, rgba(18,4,10,0.9) 0%, rgba(0,0,0,0.96) 72%);
   perspective: 1400px;
+}
+
+/* Grid view mode adjustments */
+.carousel-shell[data-grid-mode="true"] {
+  min-height: auto;
+  padding: 60px 44px 40px;
+  align-items: flex-start;
+}
+
+.carousel-shell[data-grid-mode="true"] .grid {
+  display: none !important;
+}
+
+.carousel-shell[data-grid-mode="true"] .carousel-hero {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
 }
 .carousel-shell::before,
 .carousel-shell::after {
@@ -1449,6 +1583,7 @@ footer {
       <input type="text" id="searchInput" placeholder="Tìm project theo tên, FC/FS, mô tả..." />
       <button class="filter-toggle" id="filterToggle" type="button" aria-expanded="false" aria-controls="filterPanel">Lọc</button>
     </div>
+    <button class="view-toggle-btn" id="viewToggleBtn" title="Toggle View">☰</button>
   </div>
   <div class="filter-panel" id="filterPanel">
     <div class="toolbar-row">
@@ -1488,7 +1623,10 @@ footer {
       </div>
     </div>
     <div class="grid" id="gridContainer" aria-label="Project carousel"></div>
-     </div>
+  </div>
+  <div class="projects-grid-wrapper" id="gridViewWrapper" style="display: none;">
+    <div class="projects-grid" id="projectsGridContainer"></div>
+  </div>
   <div class="empty-state" id="emptyState" style="display:none;">
     <h3>Không tìm thấy project nào</h3>
     <p>Thử chọn lại bộ lọc, hoặc dùng từ khoá khác để tìm trong bầu trời này.</p>
@@ -2255,273 +2393,6 @@ const VARIANTS = {
   messbookLetters: svgVariant(113, 'messbook-letters'),
 };
 
-// ============ PROJECTS DATA ============
-const FALLBACK_PROJECTS = [
-  {
-    id: 'p01', img: IMG.led_hanoi,
-    type: 'LED', title: 'Light Up Hanoi',
-    by: 'Whiterose VN', actor: 'FC', status: 'live',
-    desc: 'LED billboard tại 3 vị trí trung tâm Hà Nội — Vincom Bà Triệu, Lotte Liễu Giai, AEON Long Biên — phát liên tục trong 7 ngày trước sinh nhật. Mỗi vòng phát 30 giây với KV chính của BE[X]YOND.',
-    region: 'Hà Nội, VN', date: '17–23.06.2026', budget: '35,000,000 ₫',
-    target: '~120,000 lượt tiếp cận / ngày', link: '#',
-    gallery: [
-      { src: IMG.led_hanoi, caption: 'Phối cảnh LED Vincom Bà Triệu — góc trung tâm' },
-      { src: VARIANTS.ledAngle1, caption: 'LED Lotte Liễu Giai — vòng phát 20:00' },
-      { src: VARIANTS.ledCrowd, caption: 'Tối D-Day · fan tập trung tại điểm phát' },
-      { src: VARIANTS.galleryWide, caption: 'Toàn cảnh phố Bà Triệu khi LED active' },
-    ]
-  },
-  {
-    id: 'p02', img: IMG.exhibition,
-    type: 'Exhibition', title: 'Threads of Light',
-    by: 'FS White Petals', actor: 'FS', status: 'confirmed',
-    desc: 'Triển lãm offline tổng hợp 80+ bức ảnh từ fansite kết hợp tranh fan-made. Mở cửa miễn phí 2 ngày tại TP.HCM, có khu vực photobooth & lưu bút.',
-    region: 'TP.HCM, VN', date: '21–22.06.2026', budget: '18,000,000 ₫',
-    target: '~500 khách / 2 ngày', link: '#',
-    gallery: [
-      { src: IMG.exhibition, caption: 'Tổng quan không gian triển lãm' },
-      { src: VARIANTS.galleryDetail, caption: 'Khung tranh trung tâm — cánh bướm signature' },
-      { src: VARIANTS.galleryWide, caption: 'Bốn khung trưng bày song song' },
-      { src: VARIANTS.eventCrowd, caption: 'Ngày đầu mở cửa · check-in của khách' },
-    ]
-  },
-  {
-    id: 'p03', img: IMG.photobooth,
-    type: 'Photobooth', title: 'Become a Light',
-    by: 'FC Sài Gòn', actor: 'FC', status: 'confirmed',
-    desc: 'Photobooth tương tác với 6 frame BE[X]YOND khác nhau, in tại chỗ làm quà cho fan offline. Đặt tại Café Đường Sách trong 1 ngày sinh nhật.',
-    region: 'TP.HCM, VN', date: '22.06.2026', budget: '8,500,000 ₫',
-    target: '300 lượt in', link: '#',
-    gallery: [
-      { src: IMG.photobooth, caption: 'Photobooth setup hoàn chỉnh' },
-      { src: VARIANTS.photoboothPrinted, caption: 'Ảnh polaroid in cho fan' },
-      { src: VARIANTS.eventCrowd, caption: 'Hàng fan check-in 22/06' },
-    ]
-  },
-  {
-    id: 'p04', img: IMG.charity,
-    type: 'Charity', title: '26 Hopes',
-    by: 'Charity Team', actor: 'FC', status: 'active',
-    desc: 'Trao 26 phần quà cho trẻ em mồ côi tại mái ấm An Phú — gồm sách, đồ dùng học tập, và quỹ học bổng dài hạn. Ghi hình tư liệu trao trực tiếp.',
-    region: 'TP.HCM, VN', date: '15.06.2026', budget: '32,000,000 ₫',
-    target: '26 trẻ em + 1 mái ấm', link: '#',
-    gallery: [
-      { src: IMG.charity, caption: 'Các phần quà được chuẩn bị' },
-      { src: VARIANTS.charityHandover, caption: 'Ngày trao quà tại mái ấm An Phú' },
-      { src: VARIANTS.galleryWide, caption: 'Đại diện team & các em nhỏ' },
-    ]
-  },
-  {
-    id: 'p05', img: IMG.messbook,
-    type: 'Messbook', title: 'Letters Beyond',
-    by: 'FS Roseline', actor: 'FS', status: 'active',
-    desc: 'Messbook tổng hợp 120+ lá thư fan từ 14 quốc gia. In 26 bản đặc biệt — bìa cứng, foil rosé, kèm bookmark — trao Cường ngày sinh nhật.',
-    region: 'Quốc tế', date: '20.06.2026', budget: '12,000,000 ₫',
-    target: '120+ thư · 26 bản in', link: '#',
-    gallery: [
-      { src: IMG.messbook, caption: 'Cuốn messbook bản đặc biệt' },
-      { src: VARIANTS.messbookLetters, caption: 'Một số trong 120+ lá thư fan gửi về' },
-      { src: VARIANTS.fanbookPages, caption: 'Bản in 26 cuốn limited' },
-    ]
-  },
-  {
-    id: 'p06', img: IMG.stream,
-    type: 'Stream', title: 'Playlist for Cường',
-    by: 'Stream Team', actor: 'FC', status: 'live',
-    desc: 'Playlist Spotify chính thức 26 ca khúc của Cường + các bài hợp tone. Đẩy chỉ số stream xuyên suốt campaign, mục tiêu Top 50 Spotify Việt Nam.',
-    region: 'Toàn cầu', date: '20.05–25.07.2026', budget: '2,000,000 ₫',
-    target: '500,000 streams', link: '#',
-    gallery: [
-      { src: IMG.stream, caption: 'Playlist cover · Spotify' },
-      { src: VARIANTS.streamChart, caption: 'Biểu đồ tăng trưởng streams · 60 ngày' },
-      { src: VARIANTS.socialScreenshot, caption: 'Mention trên social · Twitter' },
-    ]
-  },
-  {
-    id: 'p07', img: IMG.led_seoul,
-    type: 'LED', title: 'Light Beyond Borders',
-    by: 'Intl Fandom', actor: 'FC', status: 'pending',
-    desc: 'LED billboard tại Gangnam Station Exit 11, Seoul. Phát 3 ngày trước Debut Day, đồng bộ slogan UPRIZE. Lần đầu Whiterose có project quốc tế quy mô lớn.',
-    region: 'Seoul, KR', date: '22–24.06.2026', budget: '95,000,000 ₫',
-    target: 'Phủ sóng quốc tế', link: '#',
-    gallery: [
-      { src: IMG.led_seoul, caption: 'LED Gangnam Station Exit 11' },
-      { src: VARIANTS.ledAngle1, caption: 'Góc nhìn từ phía bên kia đường' },
-      { src: VARIANTS.ledCrowd, caption: 'Người qua đường vào giờ cao điểm' },
-      { src: VARIANTS.galleryWide, caption: 'Cảnh đêm khu Gangnam' },
-    ]
-  },
-  {
-    id: 'p08', img: IMG.igads,
-    type: 'Social Ads', title: 'Beyond Stories Ads',
-    by: 'Fan lẻ (15 người)', actor: 'Individual', status: 'active',
-    desc: 'Boost 5 bài quan trọng trên IG Stories & Threads — air campaign, công bố fandom, D-Day, Debut Day, MV. Mục tiêu reach hơn 500K trong 60 ngày campaign.',
-    region: 'Toàn cầu', date: '16.05–23.06.2026', budget: '5,000,000 ₫',
-    target: '500K+ reach', link: '#',
-    gallery: [
-      { src: IMG.igads, caption: 'Mockup IG Story sponsored ad' },
-      { src: VARIANTS.socialScreenshot, caption: 'Bài đăng lên trending Twitter' },
-      { src: VARIANTS.streamChart, caption: 'Báo cáo reach · 60 ngày' },
-    ]
-  },
-  {
-    id: 'p09', img: IMG.graffiti,
-    type: 'Graffiti', title: 'Butterfly Wall',
-    by: 'Street Art Team', actor: 'FS', status: 'active',
-    desc: 'Mural cánh bướm 4×6m hợp tác họa sĩ địa phương tại quán cà phê An Phú. Ghi hình quá trình vẽ thành behind-the-scene video.',
-    region: 'TP.HCM, VN', date: '01–10.06.2026', budget: '15,000,000 ₫',
-    target: 'Mural permanent + video', link: '#',
-    gallery: [
-      { src: IMG.graffiti, caption: 'Mural hoàn thiện · ngày 10/06' },
-      { src: VARIANTS.graffitiProcess, caption: 'Day 3 of 8 · giai đoạn fill' },
-      { src: VARIANTS.galleryDetail, caption: 'Chi tiết cánh bướm trung tâm' },
-    ]
-  },
-  {
-    id: 'p10', img: IMG.qa,
-    type: 'Social', title: 'Tâm sự cùng Cường',
-    by: 'Whiterose VN', actor: 'FC', status: 'confirmed',
-    desc: 'Chuỗi 7 đêm Q&A live trên Threads, mỗi đêm một chủ đề trong hành trình: đốm sáng đầu tiên · ánh sáng hội tụ · cánh bướm · và lời chúc.',
-    region: 'Online', date: '15–21.06.2026', budget: '—',
-    target: '7 đêm live · 1500+ tham gia', link: '#',
-    gallery: [
-      { src: IMG.qa, caption: 'Banner đêm live · chủ đề 1' },
-      { src: VARIANTS.socialScreenshot, caption: 'Threads · Q&A đêm 4' },
-      { src: VARIANTS.streamChart, caption: 'Tổng lượt tham gia · 7 đêm' },
-    ]
-  },
-  {
-    id: 'p11', img: IMG.fanbook,
-    type: 'Fanbook', title: 'The Light Archive',
-    by: 'Editorial Team', actor: 'FS', status: 'active',
-    desc: 'Photobook 120 trang gồm ảnh fansite, interview, thư fan, và recap journey của Cường. Bản đặc biệt 100 cuốn cho fan đăng ký sớm.',
-    region: 'VN + Quốc tế', date: '18.06.2026', budget: '22,000,000 ₫',
-    target: '100 bản đặc biệt', link: '#',
-    gallery: [
-      { src: IMG.fanbook, caption: 'Trang đôi sample' },
-      { src: VARIANTS.fanbookPages, caption: 'Stack 26/100 bản đặc biệt' },
-      { src: VARIANTS.galleryDetail, caption: 'Bookmark đính kèm' },
-    ]
-  },
-  {
-    id: 'p12', img: IMG.cafe,
-    type: 'Offline Event', title: 'Beyond Café Day',
-    by: 'FC HN + SG', actor: 'FC', status: 'confirmed',
-    desc: 'Cup-sleeve event đồng thời tại 2 quán cà phê đối tác — Hidden Café (HN) & Tea Shop Đường Sách (SG). Miễn phí cup sleeve BE[X]YOND cho khách check-in.',
-    region: 'HN + SG, VN', date: '22.06.2026', budget: '6,000,000 ₫',
-    target: '500 cup sleeves', link: '#',
-    gallery: [
-      { src: IMG.cafe, caption: 'Cup-sleeve thiết kế chính' },
-      { src: VARIANTS.cafeDecoration, caption: 'Setup Hidden Café · Hà Nội' },
-      { src: VARIANTS.eventCrowd, caption: 'Fan check-in cả hai điểm' },
-    ]
-  },
-  {
-    id: 'p13', img: IMG.exhibition,
-    type: 'Exhibition', title: 'Mini Gallery Hà Nội',
-    by: 'FS Pink Lily', actor: 'FS', status: 'pending',
-    desc: 'Mini-exhibition tại Café Manzi, trưng bày bộ ảnh "26 góc nhìn của Cường" trong suốt 1 tuần. Có sổ lưu bút + photobook đọc tại chỗ.',
-    region: 'Hà Nội, VN', date: '17–23.06.2026', budget: '7,500,000 ₫',
-    target: '300 lượt khách', link: '#',
-    gallery: [
-      { src: IMG.exhibition, caption: 'Layout không gian Manzi' },
-      { src: VARIANTS.galleryWide, caption: '4 góc trưng bày · "26 views"' },
-      { src: VARIANTS.galleryDetail, caption: 'Một góc trưng bày chi tiết' },
-    ]
-  },
-  {
-    id: 'p14', img: IMG.charity,
-    type: 'Charity', title: 'Sách cho em',
-    by: 'FC Đà Nẵng', actor: 'FC', status: 'active',
-    desc: 'Quyên góp sách cho thư viện trường THCS vùng cao Quảng Nam — 500 cuốn sách + 1 góc đọc mang tên "Light Corner".',
-    region: 'Quảng Nam, VN', date: '10.06.2026', budget: '8,000,000 ₫',
-    target: '500 sách · 1 thư viện', link: '#',
-    gallery: [
-      { src: IMG.charity, caption: 'Sách đã đóng gói' },
-      { src: VARIANTS.charityHandover, caption: 'Trao tặng tại thư viện' },
-      { src: VARIANTS.galleryDetail, caption: 'Light Corner đã hoàn thiện' },
-    ]
-  },
-  {
-    id: 'p15', img: IMG.igads,
-    type: 'Social Ads', title: 'Twitter Trending Push',
-    by: 'Hashtag Squad', actor: 'FC', status: 'confirmed',
-    desc: 'Push 4 hashtag chính lên Top Trending Twitter VN: #BEXYOND_CuongBach (D-Day), #CuongBach26 (sinh nhật), #UPRIZE_Debut (debut), #BeyondWithCuongBach.',
-    region: 'Việt Nam', date: '23.06 · 25.06 · 16.07', budget: '—',
-    target: 'Top 5 Trending VN', link: '#',
-    gallery: [
-      { src: IMG.igads, caption: 'Booking các tài khoản tham gia' },
-      { src: VARIANTS.socialScreenshot, caption: 'Hashtag đạt Top 3 Trending VN' },
-      { src: VARIANTS.streamChart, caption: 'Lượng mention theo giờ' },
-    ]
-  },
-  {
-    id: 'p16', img: IMG.stream,
-    type: 'Stream', title: 'MV Debut Stream Marathon',
-    by: 'Stream Team Global', actor: 'FC', status: 'pending',
-    desc: 'Tổ chức 7 ngày stream marathon cho MV Debut sau khi release. Có server Discord riêng, hướng dẫn stream chuẩn, leaderboard top streamer.',
-    region: 'Toàn cầu', date: '16–23.07.2026', budget: '—',
-    target: '5M views first week', link: '#',
-    gallery: [
-      { src: IMG.stream, caption: 'Banner stream marathon' },
-      { src: VARIANTS.streamChart, caption: 'Views tracking · 7 ngày' },
-      { src: VARIANTS.socialScreenshot, caption: 'Discord server với 5K+ members' },
-    ]
-  },
-  {
-    id: 'p17', img: IMG.photobooth,
-    type: 'Photobooth', title: 'Polaroid Wall HN',
-    by: 'Fan lẻ', actor: 'Individual', status: 'pending',
-    desc: 'Tường polaroid 4×3m trưng bày 200 ảnh Cường do fan gửi đến, đặt tại sự kiện offline ngày 22/06. Mỗi fan tham gia được nhận 1 polaroid mang về.',
-    region: 'Hà Nội, VN', date: '22.06.2026', budget: '4,500,000 ₫',
-    target: '200 polaroid', link: '#',
-    gallery: [
-      { src: IMG.photobooth, caption: 'Tường polaroid hoàn thiện' },
-      { src: VARIANTS.photoboothPrinted, caption: 'Polaroid in tặng cho fan' },
-      { src: VARIANTS.eventCrowd, caption: 'Fan tham quan tường ảnh' },
-    ]
-  },
-  {
-    id: 'p18', img: IMG.messbook,
-    type: 'Messbook', title: '26 Postcards Project',
-    by: 'FS Sunshine', actor: 'FS', status: 'active',
-    desc: 'Bộ 26 postcard thiết kế riêng cho campaign, mỗi cái 1 thông điệp + 1 KV. Bán online lấy quỹ tổ chức photobooth & lệ phí site.',
-    region: 'Online', date: '01–20.06.2026', budget: '14,000,000 ₫',
-    target: '500 sets bán', link: '#',
-    gallery: [
-      { src: IMG.messbook, caption: 'Bộ 26 postcard · packaging' },
-      { src: VARIANTS.galleryDetail, caption: 'Chi tiết một postcard' },
-      { src: VARIANTS.fanbookPages, caption: 'Stack postcards in xong' },
-    ]
-  },
-  {
-    id: 'p19', img: IMG.qa,
-    type: 'Social', title: '30 Days Light Journey',
-    by: 'Whiterose VN', actor: 'FC', status: 'live',
-    desc: 'Challenge 30 ngày đếm ngược sinh nhật. Mỗi ngày một câu hỏi/thử thách, fan trả lời sẽ được tổng hợp lên website portfolio.',
-    region: 'Online toàn cầu', date: '25.05–23.06.2026', budget: '—',
-    target: '500+ fan tham gia', link: '#',
-    gallery: [
-      { src: IMG.qa, caption: 'Visual day 1 · 30 Days Challenge' },
-      { src: VARIANTS.socialScreenshot, caption: 'Bài tham gia của fan · Twitter' },
-      { src: VARIANTS.streamChart, caption: 'Mentions tracking · 30 ngày' },
-    ]
-  },
-  {
-    id: 'p20', img: IMG.cafe,
-    type: 'Offline Event', title: 'Birthday Picnic Day',
-    by: 'FC Cần Thơ', actor: 'FC', status: 'pending',
-    desc: 'Picnic ngoài trời tại Bến Ninh Kiều, đem theo bánh sinh nhật, decor, photobooth nhỏ và sổ lưu bút. Open cho mọi fan đến tham gia tự do.',
-    region: 'Cần Thơ, VN', date: '23.06.2026', budget: '3,500,000 ₫',
-    target: '~80 fan tham gia', link: '#',
-    gallery: [
-      { src: IMG.cafe, caption: 'Setup picnic · Bến Ninh Kiều' },
-      { src: VARIANTS.eventCrowd, caption: 'Buổi tối D-Day · fan tụ tập' },
-      { src: VARIANTS.cafeDecoration, caption: 'Bàn decor + bánh sinh nhật' },
-    ]
-  },
-];
-
 let PROJECTS = [];
 let supabaseClient = null;
 
@@ -2772,6 +2643,7 @@ let filterType = 'all';
 let filterActor = 'all';
 let filterStatus = 'all';
 let searchQuery = '';
+let currentView = 'ring'; // 'ring' or 'grid'
 
 function isFilteredView() {
   return filterType !== 'all' ||
@@ -2951,6 +2823,133 @@ function moveCarouselByKeyboard(direction) {
   const currentIndex = Math.max(0, slides.indexOf(active));
   const nextIndex = Math.max(0, Math.min(slides.length - 1, currentIndex + direction));
   centerCarouselSlide(slides[nextIndex], 'smooth');
+}
+
+function createGridCard(p) {
+  if (!p) return null;
+
+  const slide = document.createElement('div');
+  slide.className = 'carousel-slide grid-card';
+  slide.__project = p;
+  slide.dataset.filterMatch = 'true';
+  slide.dataset.carouselKey = `project-${p.id}`;
+
+  const statusLabel = getStatusLabel(p.status);
+  const statusClass = safeClassName(p.status);
+
+  try {
+    slide.innerHTML = `
+      <div class="card">
+        <div class="card-img">
+          <img src="${escapeHTML(p.img)}" alt="${escapeHTML(p.title)}" loading="lazy">
+          <div class="card-type">${escapeHTML(p.type)}</div>
+          <div class="card-status ${statusClass}">${escapeHTML(statusLabel)}</div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">${escapeHTML(p.title)}</div>
+          <div class="card-by">by ${escapeHTML(p.by)}</div>
+          <div class="card-desc">${escapeHTML(p.desc)}</div>
+          <div class="card-foot">
+            <span class="region">${escapeHTML(p.region)}</span>
+            <span>${escapeHTML(p.date)}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    console.error('createGridCard: Error creating HTML', err, p);
+    return null;
+  }
+
+  let downX = 0;
+  let downY = 0;
+  slide.addEventListener('pointerdown', e => { downX = e.clientX; downY = e.clientY; });
+  slide.addEventListener('click', e => {
+    if (Math.abs(e.clientX - downX) > 8 || Math.abs(e.clientY - downY) > 8) return;
+    openModal(p);
+  });
+
+  return slide;
+}
+
+function renderGridView() {
+  const container = document.getElementById('projectsGridContainer');
+  const gridShell = document.getElementById('gridViewShell');
+  const empty = document.getElementById('emptyState');
+  const main = document.getElementById('grid');
+
+  const filtered = getFiltered();
+
+  // Ensure visibility
+  if (main) main.style.display = 'block';
+  if (gridShell) {
+    gridShell.style.display = 'block';
+    gridShell.style.visibility = 'visible';
+    gridShell.style.opacity = '1';
+  }
+
+  // Clear container
+  if (container) container.innerHTML = '';
+
+  // Handle empty state
+  if (!filtered || filtered.length === 0) {
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+
+  // Hide empty state
+  if (empty) empty.style.display = 'none';
+
+  // Create and add cards
+  filtered.forEach((p, idx) => {
+    const card = createGridCard(p);
+    if (card) container.appendChild(card);
+  });
+
+  // Update result count
+  const resultCount = document.getElementById('resultCount');
+  if (resultCount) {
+    resultCount.textContent = `${filtered.length} / ${PROJECTS.length} projects`;
+  }
+}
+
+function switchView(view) {
+  currentView = view;
+  const toggleBtn = document.getElementById('viewToggleBtn');
+  const gridViewWrapper = document.getElementById('gridViewWrapper');
+  const gridContainer = document.getElementById('gridContainer');
+  const hero = document.getElementById('hero');
+
+  if (view === 'grid') {
+    // Show grid view: hero + grid cards below
+    if (hero) {
+      hero.style.display = 'flex';
+      hero.setAttribute('data-grid-mode', 'true');
+    }
+    if (gridViewWrapper) gridViewWrapper.style.display = 'block';
+    if (gridContainer) gridContainer.style.display = 'none';
+
+    // Update button icon to show ring icon (switch to ring view)
+    if (toggleBtn) toggleBtn.textContent = '◯';
+    
+    renderGridView();
+  } else {
+    // Show ring view: carousel
+    if (hero) {
+      hero.style.display = 'flex';
+      hero.setAttribute('data-grid-mode', 'false');
+    }
+    if (gridViewWrapper) gridViewWrapper.style.display = 'none';
+    if (gridContainer) gridContainer.style.display = 'flex';
+
+    // Update button icon to show grid icon (switch to grid view)
+    if (toggleBtn) toggleBtn.textContent = '☰';
+    
+    render();
+  }
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function render() {
@@ -3724,6 +3723,11 @@ document.getElementById('filterToggle').addEventListener('click', () => {
   toggle.setAttribute('aria-expanded', String(isOpen));
 });
 
+document.getElementById('viewToggleBtn').addEventListener('click', () => {
+  const nextView = currentView === 'ring' ? 'grid' : 'ring';
+  switchView(nextView);
+});
+
 // ============ SUPABASE DATA ============
 async function setProjects(rows) {
   PROJECTS = await Promise.all(rows.map(row => resolveProjectDriveGallery(normalizeProject(row))));
@@ -3771,11 +3775,10 @@ function subscribeProjectsRealtime() {
 
 async function initProjectsData() {
   if (!isSupabaseConfigured() || !window.supabase) {
-    await setProjects(FALLBACK_PROJECTS);
+    console.warn('Supabase not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY to load projects.');
+    await setProjects([]);
     return;
   }
-
-  await setProjects(FALLBACK_PROJECTS);
 
   try {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -3783,6 +3786,7 @@ async function initProjectsData() {
     subscribeProjectsRealtime();
   } catch (error) {
     console.error('Unable to load Supabase projects:', error);
+    await setProjects([]);
   }
 }
 
